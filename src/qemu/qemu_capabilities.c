@@ -4993,8 +4993,8 @@ virQEMUCapsCacheLookupDefault(virFileCachePtr cache,
     if (virQEMUCapsTypeIsAccelerated(virttype) &&
         capsType == VIR_DOMAIN_VIRT_QEMU) {
         virReportError(VIR_ERR_INVALID_ARG,
-                       _("KVM is not supported by '%s' on this host"),
-                       binary);
+                       _("the accel '%s' is not supported by '%s' on this host"),
+                       virQEMUCapsAccelStr(virttype), binary);
         goto cleanup;
     }
 
