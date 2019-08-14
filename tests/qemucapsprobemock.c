@@ -19,20 +19,12 @@
 #include <config.h>
 #include <dlfcn.h>
 
+#include "virmock.h"
 #include "internal.h"
 #include "viralloc.h"
 #include "virjson.h"
 #include "qemu/qemu_monitor.h"
 #include "qemu/qemu_monitor_json.h"
-
-#define REAL_SYM(realFunc) \
-    do { \
-        if (!realFunc && !(realFunc = dlsym(RTLD_NEXT, __FUNCTION__))) { \
-            fprintf(stderr, "Cannot find real '%s' symbol\n", \
-                    __FUNCTION__); \
-            abort(); \
-        } \
-    } while (0)
 
 static bool first = true;
 
@@ -51,16 +43,16 @@ printLineSkipEmpty(const char *line,
 }
 
 
-static int (*realQemuMonitorSend)(qemuMonitorPtr mon,
-                                  qemuMonitorMessagePtr msg);
+static int (*real_qemuMonitorSend)(qemuMonitorPtr mon,
+                                   qemuMonitorMessagePtr msg);
 
 int
-qemuMonitorSend(qemuMonitorPtr mon,
-                qemuMonitorMessagePtr msg)
+VIR_MOCK_SYM(qemuMonitorSend)(qemuMonitorPtr mon,
+                              qemuMonitorMessagePtr msg)
 {
     char *reformatted;
 
-    REAL_SYM(realQemuMonitorSend);
+    VIR_MOCK_REAL_INIT(qemuMonitorSend);
 
     if (!(reformatted = virJSONStringReformat(msg->txBuffer, true))) {
         fprintf(stderr, "Failed to reformat command string '%s'\n", msg->txBuffer);
@@ -75,26 +67,27 @@ qemuMonitorSend(qemuMonitorPtr mon,
     printLineSkipEmpty(reformatted, stdout);
     VIR_FREE(reformatted);
 
-    return realQemuMonitorSend(mon, msg);
+    return real_qemuMonitorSend(mon, msg);
 }
+VIR_MOCK_SETUP(qemuMonitorSend)
 
 
-static int (*realQemuMonitorJSONIOProcessLine)(qemuMonitorPtr mon,
-                                               const char *line,
-                                               qemuMonitorMessagePtr msg);
+static int (*real_qemuMonitorJSONIOProcessLine)(qemuMonitorPtr mon,
+                                                const char *line,
+                                                qemuMonitorMessagePtr msg);
 
 int
-qemuMonitorJSONIOProcessLine(qemuMonitorPtr mon,
-                             const char *line,
-                             qemuMonitorMessagePtr msg)
+VIR_MOCK_SYM(qemuMonitorJSONIOProcessLine)(qemuMonitorPtr mon,
+                                           const char *line,
+                                           qemuMonitorMessagePtr msg)
 {
     virJSONValuePtr value = NULL;
     char *json = NULL;
     int ret;
 
-    REAL_SYM(realQemuMonitorJSONIOProcessLine);
+    VIR_MOCK_REAL_INIT(qemuMonitorJSONIOProcessLine);
 
-    ret = realQemuMonitorJSONIOProcessLine(mon, line, msg);
+    ret = real_qemuMonitorJSONIOProcessLine(mon, line, msg);
 
     if (ret == 0) {
         if (!(value = virJSONValueFromString(line)) ||
@@ -120,3 +113,4 @@ qemuMonitorJSONIOProcessLine(qemuMonitorPtr mon,
     virJSONValueFree(value);
     return ret;
 }
+VIR_MOCK_SETUP(qemuMonitorJSONIOProcessLine)

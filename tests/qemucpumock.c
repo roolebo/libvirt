@@ -23,14 +23,16 @@
 #define LIBVIRT_QEMU_CAPSPRIV_H_ALLOW
 #include "qemu/qemu_capspriv.h"
 #include "testutilshostcpus.h"
+#include "virmock.h"
 #include "virarch.h"
 
 
 virCPUDefPtr
-virQEMUCapsProbeHostCPU(virArch hostArch ATTRIBUTE_UNUSED,
-                        virDomainCapsCPUModelsPtr models ATTRIBUTE_UNUSED)
+VIR_MOCK_SYM(virQEMUCapsProbeHostCPU)(virArch hostArch ATTRIBUTE_UNUSED,
+                                      virDomainCapsCPUModelsPtr models ATTRIBUTE_UNUSED)
 {
     const char *model = getenv("VIR_TEST_MOCK_FAKE_HOST_CPU");
 
     return testUtilsHostCpusGetDefForModel(model);
 }
+VIR_MOCK_SETUP(virQEMUCapsProbeHostCPU)

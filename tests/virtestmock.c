@@ -149,7 +149,7 @@ checkPath(const char *path,
 }
 
 
-int open(const char *path, int flags, ...)
+int VIR_MOCK_SYM(open)(const char *path, int flags, ...)
 {
     int ret;
 
@@ -169,8 +169,9 @@ int open(const char *path, int flags, ...)
     }
     return ret;
 }
+VIR_MOCK_SETUP(open)
 
-FILE *fopen(const char *path, const char *mode)
+FILE *VIR_MOCK_SYM(fopen)(const char *path, const char *mode)
 {
     init_syms();
 
@@ -178,9 +179,10 @@ FILE *fopen(const char *path, const char *mode)
 
     return real_fopen(path, mode);
 }
+VIR_MOCK_SETUP(fopen)
 
 
-int access(const char *path, int mode)
+int VIR_MOCK_SYM(access)(const char *path, int mode)
 {
     init_syms();
 
@@ -188,6 +190,7 @@ int access(const char *path, int mode)
 
     return real_access(path, mode);
 }
+VIR_MOCK_SETUP(access)
 
 
 #define VIR_MOCK_STAT_HOOK \
@@ -204,7 +207,7 @@ static int virMockStatRedirect(const char *path ATTRIBUTE_UNUSED, char **newpath
 }
 
 
-int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+int VIR_MOCK_SYM(connect)(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
     init_syms();
 
@@ -218,3 +221,4 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
     return real_connect(sockfd, addr, addrlen);
 }
+VIR_MOCK_SETUP(connect)

@@ -19,12 +19,15 @@
 #include <config.h>
 
 #include "util/virhashcode.h"
+#include "virmock.h"
+#include <stdio.h>
 
 uint32_t
-virHashCodeGen(const void *key,
-               size_t len,
-               uint32_t seed ATTRIBUTE_UNUSED)
+VIR_MOCK_SYM(virHashCodeGen)(const void *key,
+                             size_t len,
+                             uint32_t seed ATTRIBUTE_UNUSED)
 {
+  fprintf(stderr, "Hey ho!\n");
     const uint8_t *k = key;
     uint32_t h = 0;
     size_t i;
@@ -34,3 +37,4 @@ virHashCodeGen(const void *key,
 
     return h;
 }
+VIR_MOCK_SETUP(virHashCodeGen)

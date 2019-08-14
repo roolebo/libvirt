@@ -483,8 +483,9 @@ void freePaths(void)
 
 
 int
-virProcessRunInFork(virProcessForkCallback cb,
-                    void *opaque)
+VIR_MOCK_SYM(virProcessRunInFork)(virProcessForkCallback cb,
+                                  void *opaque)
 {
     return cb(-1, opaque);
 }
+VIR_MOCK_SETUP(virProcessRunInFork)

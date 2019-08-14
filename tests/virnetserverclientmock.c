@@ -20,21 +20,25 @@
 
 #include "rpc/virnetsocket.h"
 #include "virutil.h"
+#include "virmock.h"
 #include "internal.h"
 
-int virEventAddTimeout(int frequency ATTRIBUTE_UNUSED,
-                       virEventTimeoutCallback cb ATTRIBUTE_UNUSED,
-                       void *opaque ATTRIBUTE_UNUSED,
-                       virFreeCallback ff ATTRIBUTE_UNUSED)
+int
+VIR_MOCK_SYM(virEventAddTimeout)(int frequency ATTRIBUTE_UNUSED,
+                                 virEventTimeoutCallback cb ATTRIBUTE_UNUSED,
+                                 void *opaque ATTRIBUTE_UNUSED,
+                                 virFreeCallback ff ATTRIBUTE_UNUSED)
 {
     return 0;
 }
+VIR_MOCK_SETUP(virEventAddTimeout)
 
-int virNetSocketGetUNIXIdentity(virNetSocketPtr sock ATTRIBUTE_UNUSED,
-                                uid_t *uid,
-                                gid_t *gid,
-                                pid_t *pid,
-                                unsigned long long *timestamp)
+int
+VIR_MOCK_SYM(virNetSocketGetUNIXIdentity)(virNetSocketPtr sock ATTRIBUTE_UNUSED,
+                                          uid_t *uid,
+                                          gid_t *gid,
+                                          pid_t *pid,
+                                          unsigned long long *timestamp)
 {
     *uid = 666;
     *gid = 7337;
@@ -42,21 +46,26 @@ int virNetSocketGetUNIXIdentity(virNetSocketPtr sock ATTRIBUTE_UNUSED,
     *timestamp = 12345678;
     return 0;
 }
+VIR_MOCK_SETUP(virNetSocketGetUNIXIdentity)
 
-char *virGetUserName(uid_t uid ATTRIBUTE_UNUSED)
+char *VIR_MOCK_SYM(virGetUserName)(uid_t uid ATTRIBUTE_UNUSED)
 {
     return strdup("astrochicken");
 }
+VIR_MOCK_SETUP(virGetUserName)
 
-char *virGetGroupName(gid_t gid ATTRIBUTE_UNUSED)
+char *VIR_MOCK_SYM(virGetGroupName)(gid_t gid ATTRIBUTE_UNUSED)
 {
     return strdup("fictionalusers");
 }
+VIR_MOCK_SETUP(virGetGroupName)
 
-int virNetSocketGetSELinuxContext(virNetSocketPtr sock ATTRIBUTE_UNUSED,
-                                  char **context)
+int
+VIR_MOCK_SYM(virNetSocketGetSELinuxContext)(virNetSocketPtr sock ATTRIBUTE_UNUSED,
+                                            char **context)
 {
     if (!(*context = strdup("foo_u:bar_r:wizz_t:s0-s0:c0.c1023")))
         return -1;
     return 0;
 }
+VIR_MOCK_SETUP(virNetSocketGetSELinuxContext)

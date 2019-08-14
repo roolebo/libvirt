@@ -576,6 +576,8 @@ libvirt_la_LDFLAGS = \
 		$(LIBVIRT_NODELETE) \
 		$(NO_UNDEFINED_LDFLAGS) \
 		$(AM_LDFLAGS) \
+		-Wl,-interposable \
+		-multi_module \
 		$(NULL)
 libvirt_la_BUILT_LIBADD += ../gnulib/lib/libgnu.la
 libvirt_la_LIBADD += \

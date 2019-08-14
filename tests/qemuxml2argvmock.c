@@ -42,43 +42,48 @@
 
 #define VIR_FROM_THIS VIR_FROM_NONE
 
-long virGetSystemPageSize(void)
+long VIR_MOCK_SYM(virGetSystemPageSize)(void)
 {
     return 4096;
 }
+VIR_MOCK_SETUP(virGetSystemPageSize)
 
-time_t time(time_t *t)
+time_t VIR_MOCK_SYM(time)(time_t *t)
 {
     const time_t ret = 1234567890;
     if (t)
         *t = ret;
     return ret;
 }
+VIR_MOCK_SETUP(time)
 
 bool
-virNumaIsAvailable(void)
+VIR_MOCK_SYM(virNumaIsAvailable)(void)
 {
     return true;
 }
+VIR_MOCK_SETUP(virNumaIsAvailable)
 
 int
-virNumaGetMaxNode(void)
+VIR_MOCK_SYM(virNumaGetMaxNode)(void)
 {
     return 7;
 }
+VIR_MOCK_SETUP(virNumaGetMaxNode)
 
 /* We shouldn't need to mock virNumaNodeIsAvailable() and *definitely* not
  * virNumaNodesetIsAvailable(), but it seems to be the only way to get
  * mocking to work with Clang on FreeBSD, so keep these duplicates around
  * until we figure out a cleaner solution */
 bool
-virNumaNodeIsAvailable(int node)
+VIR_MOCK_SYM(virNumaNodeIsAvailable)(int node)
 {
     return node >= 0 && node <= virNumaGetMaxNode();
 }
+VIR_MOCK_SETUP(virNumaNodeIsAvailable)
 
 bool
-virNumaNodesetIsAvailable(virBitmapPtr nodeset)
+VIR_MOCK_SYM(virNumaNodesetIsAvailable)(virBitmapPtr nodeset)
 {
     ssize_t bit = -1;
 
@@ -94,9 +99,10 @@ virNumaNodesetIsAvailable(virBitmapPtr nodeset)
 
     return true;
 }
+VIR_MOCK_SETUP(virNumaNodesetIsAvailable)
 
 char *
-virTPMCreateCancelPath(const char *devpath)
+VIR_MOCK_SYM(virTPMCreateCancelPath)(const char *devpath)
 {
     char *path;
     (void)devpath;
@@ -105,6 +111,7 @@ virTPMCreateCancelPath(const char *devpath)
 
     return path;
 }
+VIR_MOCK_SETUP(virTPMCreateCancelPath)
 
 /**
  * Large values for memory would fail on 32 bit systems, despite having
@@ -176,29 +183,31 @@ virNetDevSetOnline(const char *ifname ATTRIBUTE_UNUSED,
 }
 
 int
-virNetDevRunEthernetScript(const char *ifname ATTRIBUTE_UNUSED,
-                           const char *script ATTRIBUTE_UNUSED)
+VIR_MOCK_SYM(virNetDevRunEthernetScript)(const char *ifname ATTRIBUTE_UNUSED,
+                                         const char *script ATTRIBUTE_UNUSED)
 {
     return 0;
 }
+VIR_MOCK_SETUP(virNetDevRunEthernetScript)
 
 char *
-virHostGetDRMRenderNode(void)
+VIR_MOCK_SYM(virHostGetDRMRenderNode)(void)
 {
     char *dst = NULL;
 
     ignore_value(VIR_STRDUP(dst, "/dev/dri/foo"));
     return dst;
 }
+VIR_MOCK_SETUP(virHostGetDRMRenderNode)
 
 static void (*real_virCommandPassFD)(virCommandPtr cmd, int fd, unsigned int flags);
 
 static const int testCommandPassSafeFDs[] = { 1730, 1731 };
 
 void
-virCommandPassFD(virCommandPtr cmd,
-                 int fd,
-                 unsigned int flags)
+VIR_MOCK_SYM(virCommandPassFD)(virCommandPtr cmd,
+                               int fd,
+                               unsigned int flags)
 {
     size_t i;
 
@@ -212,19 +221,21 @@ virCommandPassFD(virCommandPtr cmd,
         }
     }
 }
+VIR_MOCK_SETUP(virCommandPassFD)
 
 int
-virNetDevOpenvswitchGetVhostuserIfname(const char *path ATTRIBUTE_UNUSED,
-                                       char **ifname)
+VIR_MOCK_SYM(virNetDevOpenvswitchGetVhostuserIfname)(const char *path ATTRIBUTE_UNUSED,
+                                                     char **ifname)
 {
     return VIR_STRDUP(*ifname, "vhost-user0");
 }
+VIR_MOCK_SETUP(virNetDevOpenvswitchGetVhostuserIfname)
 
 int
-qemuInterfaceOpenVhostNet(virDomainDefPtr def ATTRIBUTE_UNUSED,
-                          virDomainNetDefPtr net,
-                          int *vhostfd,
-                          size_t *vhostfdSize)
+VIR_MOCK_SYM(qemuInterfaceOpenVhostNet)(virDomainDefPtr def ATTRIBUTE_UNUSED,
+                                        virDomainNetDefPtr net,
+                                        int *vhostfd,
+                                        size_t *vhostfdSize)
 {
     size_t i;
 
@@ -237,11 +248,10 @@ qemuInterfaceOpenVhostNet(virDomainDefPtr def ATTRIBUTE_UNUSED,
         vhostfd[i] = STDERR_FILENO + 42 + i;
     return 0;
 }
-
+VIR_MOCK_SETUP(qemuInterfaceOpenVhostNet)
 
 int
-qemuOpenChrChardevUNIXSocket(const virDomainChrSourceDef *dev ATTRIBUTE_UNUSED)
-
+VIR_MOCK_SYM(qemuOpenChrChardevUNIXSocket)(const virDomainChrSourceDef *dev ATTRIBUTE_UNUSED)
 {
     /* We need to return an FD number for a UNIX listener socket,
      * which will be given to QEMU via a CLI arg. We need a fixed
@@ -254,13 +264,14 @@ qemuOpenChrChardevUNIXSocket(const virDomainChrSourceDef *dev ATTRIBUTE_UNUSED)
         abort();
     return 1729;
 }
+VIR_MOCK_SETUP(qemuOpenChrChardevUNIXSocket)
 
 
 int
-qemuBuildTPMOpenBackendFDs(const char *tpmdev ATTRIBUTE_UNUSED,
-                           const char *cancel_path ATTRIBUTE_UNUSED,
-                           int *tpmfd,
-                           int *cancelfd)
+VIR_MOCK_SYM(qemuBuildTPMOpenBackendFDs)(const char *tpmdev ATTRIBUTE_UNUSED,
+                                         const char *cancel_path ATTRIBUTE_UNUSED,
+                                         int *tpmfd,
+                                         int *cancelfd)
 {
     if (fcntl(1730, F_GETFD) != -1 ||
         fcntl(1731, F_GETFD) != -1)
@@ -270,3 +281,4 @@ qemuBuildTPMOpenBackendFDs(const char *tpmdev ATTRIBUTE_UNUSED,
     *cancelfd = 1731;
     return 0;
 }
+VIR_MOCK_SETUP(qemuBuildTPMOpenBackendFDs)

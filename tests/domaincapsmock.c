@@ -16,6 +16,7 @@
 
 #include <config.h>
 
+#include "virmock.h"
 #include "virhostcpu.h"
 #ifdef WITH_LIBXL
 # include "libxl/libxl_capabilities.h"
@@ -30,7 +31,8 @@ libxlCapsHasPVUSB(void)
 #endif
 
 int
-virHostCPUGetKVMMaxVCPUs(void)
+VIR_MOCK_SYM(virHostCPUGetKVMMaxVCPUs)(void)
 {
     return INT_MAX;
 }
+VIR_MOCK_SETUP(virHostCPUGetKVMMaxVCPUs)

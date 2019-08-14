@@ -288,3 +288,15 @@
             abort(); \
         } \
     } while (0)
+
+#ifdef __APPLE__
+# define VIR_MOCK_SYM(sym) mock_##sym
+# define VIR_MOCK_SETUP(sym) \
+  __attribute__((used)) struct { void *mock; void *orig; } \
+  static const mocked_##sym \
+  __attribute__((section("__DATA, __interpose"))) = { &mock_##sym, &sym };
+# pragma clang diagnostic ignored "-Wmissing-prototypes"
+#else
+# define VIR_MOCK_SYM(sym) sym
+# define VIR_MOCK_SETUP(sym)
+#endif

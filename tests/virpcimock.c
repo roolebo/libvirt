@@ -867,7 +867,7 @@ init_env(void)
  */
 
 int
-access(const char *path, int mode)
+VIR_MOCK_SYM(access)(const char *path, int mode)
 {
     int ret;
 
@@ -884,6 +884,7 @@ access(const char *path, int mode)
     }
     return ret;
 }
+VIR_MOCK_SETUP(access)
 
 
 static int
@@ -898,7 +899,7 @@ virMockStatRedirect(const char *path, char **newpath)
 
 
 int
-open(const char *path, int flags, ...)
+VIR_MOCK_SYM(open)(const char *path, int flags, ...)
 {
     int ret;
     char *newpath = NULL;
@@ -931,9 +932,10 @@ open(const char *path, int flags, ...)
     VIR_FREE(newpath);
     return ret;
 }
+VIR_MOCK_SETUP(open)
 
 DIR *
-opendir(const char *path)
+VIR_MOCK_SYM(opendir)(const char *path)
 {
     DIR *ret;
     char *newpath = NULL;
@@ -949,17 +951,19 @@ opendir(const char *path)
     VIR_FREE(newpath);
     return ret;
 }
+VIR_MOCK_SETUP(opendir)
 
 int
-close(int fd)
+VIR_MOCK_SYM(close)(int fd)
 {
     if (remove_fd(fd) < 0)
         return -1;
     return real_close(fd);
 }
+VIR_MOCK_SETUP(close)
 
 char *
-virFileCanonicalizePath(const char *path)
+VIR_MOCK_SYM(virFileCanonicalizePath)(const char *path)
 {
     char *ret;
 
@@ -979,6 +983,7 @@ virFileCanonicalizePath(const char *path)
 
     return ret;
 }
+VIR_MOCK_SETUP(virFileCanonicalizePath)
 
 # include "virmockstathelpers.c"
 

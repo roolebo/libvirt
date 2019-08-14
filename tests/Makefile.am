@@ -53,6 +53,8 @@ MOCKLIBS_LDFLAGS = -avoid-version \
 
 DRIVERLIB_LDFLAGS = \
 	-avoid-version \
+	-Wl,-interposable \
+	-multi_module \
 	-rpath /evil/libtool/hack/to/force/shared/lib/creation \
 	$(MINGW_EXTRA_LDFLAGS)
 

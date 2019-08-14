@@ -38,7 +38,7 @@ static int numa_avail = -1;
  * changed in the tests) exists and cache the result.
  */
 bool
-virNumaIsAvailable(void)
+VIR_MOCK_SYM(virNumaIsAvailable)(void)
 {
     if (numa_avail < 0) {
         char *sysfs_node_path = NULL;
@@ -62,9 +62,10 @@ virNumaIsAvailable(void)
 
     return numa_avail;
 }
+VIR_MOCK_SETUP(virNumaIsAvailable)
 
 int
-virNumaGetMaxNode(void)
+VIR_MOCK_SYM(virNumaGetMaxNode)(void)
 {
     int ret = -1;
     virBitmapPtr map = NULL;
@@ -76,9 +77,10 @@ virNumaGetMaxNode(void)
     virBitmapFree(map);
     return ret;
 }
+VIR_MOCK_SETUP(virNumaGetMaxNode)
 
 bool
-virNumaNodeIsAvailable(int node)
+VIR_MOCK_SYM(virNumaNodeIsAvailable)(int node)
 {
     bool ret = false;
     virBitmapPtr map = NULL;
@@ -90,11 +92,12 @@ virNumaNodeIsAvailable(int node)
     virBitmapFree(map);
     return ret;
 }
+VIR_MOCK_SETUP(virNumaNodeIsAvailable)
 
 int
-virNumaGetNodeMemory(int node,
-                     unsigned long long *memsize,
-                     unsigned long long *memfree)
+VIR_MOCK_SYM(virNumaGetNodeMemory)(int node,
+                                   unsigned long long *memsize,
+                                   unsigned long long *memfree)
 {
     const unsigned long long base = 1 << 30;
 
@@ -106,16 +109,18 @@ virNumaGetNodeMemory(int node,
 
     return 0;
 }
+VIR_MOCK_SETUP(virNumaGetNodeMemory)
 
 int
-virNumaGetDistances(int node ATTRIBUTE_UNUSED,
-                    int **distances,
-                    int *ndistances)
+VIR_MOCK_SYM(virNumaGetDistances)(int node ATTRIBUTE_UNUSED,
+                                  int **distances,
+                                  int *ndistances)
 {
     *distances = NULL;
     *ndistances = 0;
     return 0;
 }
+VIR_MOCK_SETUP(virNumaGetDistances)
 
 /*
  * TODO: Adapt virNumaGetHugePageInfo{Path,Dir} to use sysfs so that the
@@ -123,11 +128,11 @@ virNumaGetDistances(int node ATTRIBUTE_UNUSED,
  * have copied info from /sys (as we do with /sys/devices/system).
  */
 int
-virNumaGetPages(int node,
-                unsigned int **pages_size,
-                unsigned long long **pages_avail,
-                unsigned long long **pages_free,
-                size_t *npages)
+VIR_MOCK_SYM(virNumaGetPages)(int node,
+                              unsigned int **pages_size,
+                              unsigned long long **pages_avail,
+                              unsigned long long **pages_free,
+                              size_t *npages)
 {
     const int pages_def[] = { 4, 2 * 1024, 1 * 1024 * 1024};
     const int npages_def = ARRAY_CARDINALITY(pages_def);
@@ -171,9 +176,10 @@ virNumaGetPages(int node,
 
     return 0;
 }
+VIR_MOCK_SETUP(virNumaGetPages)
 
 int
-virNumaGetNodeCPUs(int node, virBitmapPtr *cpus)
+VIR_MOCK_SYM(virNumaGetNodeCPUs)(int node, virBitmapPtr *cpus)
 {
     int ret = -1;
     char *cpulist = NULL;
@@ -192,3 +198,4 @@ virNumaGetNodeCPUs(int node, virBitmapPtr *cpus)
     VIR_FREE(cpulist);
     return ret;
 }
+VIR_MOCK_SETUP(virNumaGetNodeCPUs)

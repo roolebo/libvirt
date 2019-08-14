@@ -19,13 +19,15 @@
 #include <config.h>
 #include <unistd.h>
 
+#include "virmock.h"
 #include "internal.h"
 #include "virfile.h"
 
 bool
-virFileExists(const char *path)
+VIR_MOCK_SYM(virFileExists)(const char *path)
 {
     if (STREQ(path, "/dev/kvm"))
         return true;
     return access(path, F_OK) == 0;
 }
+VIR_MOCK_SETUP(virFileExists)

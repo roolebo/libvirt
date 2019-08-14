@@ -30,8 +30,8 @@
 # define VIR_FROM_THIS VIR_FROM_NONE
 
 int
-virRandomBytes(unsigned char *buf,
-               size_t buflen)
+VIR_MOCK_SYM(virRandomBytes)(unsigned char *buf,
+                             size_t buflen)
 {
     size_t i;
 
@@ -40,8 +40,9 @@ virRandomBytes(unsigned char *buf,
 
     return 0;
 }
+VIR_MOCK_SETUP(virRandomBytes)
 
-uint64_t virRandomBits(int nbits)
+uint64_t VIR_MOCK_SYM(virRandomBits)(int nbits)
 {
     /* Chosen by a fair roll of a 2^64 sided dice */
     uint64_t ret = 0x0706050403020100;
@@ -49,13 +50,15 @@ uint64_t virRandomBits(int nbits)
         ret &= ((1ULL << nbits) - 1);
     return ret;
 }
+VIR_MOCK_SETUP(virRandomBits)
 
-int virRandomGenerateWWN(char **wwn,
-                         const char *virt_type ATTRIBUTE_UNUSED)
+int VIR_MOCK_SYM(virRandomGenerateWWN)(char **wwn,
+                                       const char *virt_type ATTRIBUTE_UNUSED)
 {
     return virAsprintf(wwn, "5100000%09llx",
                        (unsigned long long)virRandomBits(36));
 }
+VIR_MOCK_SETUP(virRandomGenerateWWN)
 
 
 static int (*real_gnutls_dh_params_generate2)(gnutls_dh_params_t dparams,
@@ -65,8 +68,8 @@ static gnutls_dh_params_t params_cache;
 static unsigned int cachebits;
 
 int
-gnutls_dh_params_generate2(gnutls_dh_params_t dparams,
-                           unsigned int bits)
+VIR_MOCK_SYM(gnutls_dh_params_generate2)(gnutls_dh_params_t dparams,
+                                         unsigned int bits)
 {
     int rc = 0;
 
@@ -91,6 +94,7 @@ gnutls_dh_params_generate2(gnutls_dh_params_t dparams,
 
     return gnutls_dh_params_cpy(dparams, params_cache);
 }
+VIR_MOCK_SETUP(gnutls_dh_params_generate2)
 #else /* WIN32 */
 /* Can't mock on WIN32 */
 #endif
