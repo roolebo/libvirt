@@ -1,0 +1,81 @@
+# vim: filetype=automake
+
+APPLEVZ_DRIVER_SOURCES = \
+	applevz/applevz_driver.h \
+	applevz/applevz_driver.m \
+	$(NULL)
+
+
+DRIVER_SOURCE_FILES += $(addprefix $(srcdir)/,$(APPLEVZ_DRIVER_SOURCES))
+STATEFUL_DRIVER_SOURCE_FILES += $(addprefix $(srcdir)/,$(APPLEVZ_DRIVER_SOURCES))
+EXTRA_DIST += $(APPLEVZ_DRIVER_SOURCES)
+
+
+if WITH_APPLEVZ
+noinst_LTLIBRARIES += libvirt_driver_applevz_impl.la
+libvirt_driver_applevz_la_SOURCES =
+libvirt_driver_applevz_la_LIBADD = \
+	libvirt_driver_applevz_impl.la \
+	libvirt.la \
+	$(GLIB_LIBS) \
+	$(NULL)
+mod_LTLIBRARIES += libvirt_driver_applevz.la
+libvirt_driver_applevz_la_LDFLAGS = $(AM_LDFLAGS_MOD_NOUNDEF)
+libvirt_driver_applevz_impl_la_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(NULL)
+libvirt_driver_applevz_impl_la_SOURCES = $(APPLEVZ_DRIVER_SOURCES)
+libvirt_driver_applevz_impl_la_LIBADD = \
+	$(LIBNL_LIBS) \
+	$(NULL)
+
+sbin_PROGRAMS += virtapplevzd
+
+nodist_conf_DATA += applevz/virtapplevzd.conf
+augeas_DATA += applevz/virtapplevzd.aug
+augeastest_DATA += applevz/test_virtapplevzd.aug
+CLEANFILES += applevz/virtapplevzd.aug
+
+virtapplevzd_SOURCES = $(REMOTE_DAEMON_SOURCES)
+nodist_virtapplevzd_SOURCES = $(REMOTE_DAEMON_GENERATED)
+virtapplevzd_CFLAGS = \
+       $(REMOTE_DAEMON_CFLAGS) \
+       -DDAEMON_NAME="\"virtapplevzd\"" \
+       -DMODULE_NAME="\"applevz\"" \
+       $(NULL)
+virtapplevzd_LDFLAGS = $(REMOTE_DAEMON_LD_FLAGS)
+virtapplevzd_LDADD = $(REMOTE_DAEMON_LD_ADD)
+
+SYSCONF_FILES += applevz/virtapplevzd.sysconf
+
+VIRTAPPLEVZD_UNIT_VARS = \
+	$(VIRTD_UNIT_VARS) \
+	-e 's|[@]name[@]|Libvirt applevz|g' \
+	-e 's|[@]service[@]|virtapplevzd|g' \
+	-e 's|[@]sockprefix[@]|virtapplevzd|g' \
+	$(NULL)
+
+applevz/virtapplevzd.conf: remote/libvirtd.conf.in
+	$(AM_V_GEN)$(SED) \
+		-e '/[@]CUT_ENABLE_IP[@]/,/[@]END[@]/d' \
+		-e 's/[@]DAEMON_NAME[@]/virtapplevzd/' \
+		$< > $@
+
+applevz/virtapplevzd.aug: remote/libvirtd.aug.in
+	$(AM_V_GEN)$(SED) \
+		-e '/[@]CUT_ENABLE_IP[@]/,/[@]END[@]/d' \
+		-e 's/[@]DAEMON_NAME[@]/virtapplevzd/' \
+		-e 's/[@]DAEMON_NAME_UC[@]/Virtapplevzd/' \
+		$< > $@
+
+applevz/test_virtapplevzd.aug: remote/test_libvirtd.aug.in \
+		applevz/virtapplevzd.conf $(AUG_GENTEST_SCRIPT)
+	$(AM_V_GEN)$(AUG_GENTEST) applevz/virtapplevzd.conf \
+		$(srcdir)/remote/test_libvirtd.aug.in | \
+		$(SED) \
+		-e '/[@]CUT_ENABLE_IP[@]/,/[@]END[@]/d' \
+		-e 's/[@]DAEMON_NAME[@]/virtapplevzd/' \
+		-e 's/[@]DAEMON_NAME_UC[@]/Virtapplevzd/' \
+		> $@ || rm -f $@
+
+endif WITH_APPLEVZ

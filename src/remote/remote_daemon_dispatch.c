@@ -2013,6 +2013,9 @@ remoteDispatchProbeURI(bool readonly,
 # ifdef WITH_VZ
             "vz",
 # endif
+# ifdef WITH_APPLEVZ
+            "applevz",
+# endif
         };
         ssize_t i;
 
@@ -2115,6 +2118,7 @@ remoteDispatchConnectOpen(virNetServerPtr server G_GNUC_UNUSED,
         STREQ(type, "LXC") ||
         STREQ(type, "VBOX") ||
         STREQ(type, "bhyve") ||
+        STREQ(type, "applevz") ||
         STREQ(type, "vz") ||
         STREQ(type, "Parallels")) {
         VIR_DEBUG("Hypervisor driver found, setting URIs for secondary drivers");

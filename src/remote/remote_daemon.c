@@ -185,6 +185,10 @@ static int daemonInitialize(void)
     if (virDriverLoadModule("vz", "vzRegister", false) < 0)
         return -1;
 # endif
+# ifdef WITH_APPLEVZ
+    if (virDriverLoadModule("applevz", "applevzRegister", false) < 0)
+        return -1;
+# endif
 #endif
     return 0;
 }

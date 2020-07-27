@@ -118,6 +118,7 @@ include qemu/Makefile.inc.am
 include bhyve/Makefile.inc.am
 include libxl/Makefile.inc.am
 include vz/Makefile.inc.am
+include applevz/Makefile.inc.am
 include lxc/Makefile.inc.am
 include interface/Makefile.inc.am
 include network/Makefile.inc.am

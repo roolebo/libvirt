@@ -6813,6 +6813,7 @@ qemuBuildMachineCommandLine(virCommandPtr cmd,
     case VIR_DOMAIN_VIRT_PARALLELS:
     case VIR_DOMAIN_VIRT_BHYVE:
     case VIR_DOMAIN_VIRT_VZ:
+    case VIR_DOMAIN_VIRT_APPLEVZ:
     case VIR_DOMAIN_VIRT_NONE:
         virReportError(VIR_ERR_CONFIG_UNSUPPORTED,
                        _("the QEMU binary does not support %s"),
