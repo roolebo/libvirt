@@ -1,8 +1,14 @@
 # vim: filetype=automake
 
 APPLEVZ_DRIVER_SOURCES = \
+	applevz/applevz.m \
+	applevz/applevz.h \
 	applevz/applevz_driver.h \
 	applevz/applevz_driver.m \
+	applevz/applevz_domain.h \
+	applevz/applevz_domain.m \
+	applevz/applevz_utils.m \
+	applevz/applevz_utils.h \
 	$(NULL)
 
 
@@ -20,8 +26,12 @@ libvirt_driver_applevz_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(NULL)
 mod_LTLIBRARIES += libvirt_driver_applevz.la
-libvirt_driver_applevz_la_LDFLAGS = $(AM_LDFLAGS_MOD_NOUNDEF)
-libvirt_driver_applevz_impl_la_CFLAGS = \
+libvirt_driver_applevz_la_LDFLAGS = \
+        -framework Virtualization \
+        $(AM_LDFLAGS_MOD_NOUNDEF)
+libvirt_driver_applevz_impl_la_OBJCFLAGS = \
+	-I$(srcdir)/conf \
+	-I$(builddir)/access \
 	$(AM_CFLAGS) \
 	$(NULL)
 libvirt_driver_applevz_impl_la_SOURCES = $(APPLEVZ_DRIVER_SOURCES)
