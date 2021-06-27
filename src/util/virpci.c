@@ -288,11 +288,14 @@ virPCIDeviceGetDriverPathAndName(virPCIDevicePtr dev, char **path, char **name)
 
 
 static int
-virPCIDeviceConfigOpen(virPCIDevicePtr dev, bool fatal)
+virPCIDeviceConfigOpen(virPCIDevicePtr dev, bool fatal, bool hdr_rdonly)
 {
     int fd;
 
-    fd = open(dev->path, O_RDWR);
+    if (hdr_rdonly)
+        fd = open(dev->path, O_RDONLY);
+    else
+        fd = open(dev->path, O_RDWR);
 
     if (fd < 0) {
         if (fatal) {
@@ -677,7 +680,7 @@ virPCIDeviceIsParent(virPCIDevicePtr dev, virPCIDevicePtr check, void *data)
     if (dev->address.domain != check->address.domain)
         return 0;
 
-    if ((fd = virPCIDeviceConfigOpen(check, false)) < 0)
+    if ((fd = virPCIDeviceConfigOpen(check, false, true)) < 0)
         return 0;
 
     /* Is it a bridge? */
@@ -725,7 +728,7 @@ virPCIDeviceIsParent(virPCIDevicePtr dev, virPCIDevicePtr check, void *data)
             int bestfd;
             uint8_t best_secondary;
 
-            if ((bestfd = virPCIDeviceConfigOpen(*best, false)) < 0)
+            if ((bestfd = virPCIDeviceConfigOpen(*best, false, true)) < 0)
                 goto cleanup;
             best_secondary = virPCIDeviceRead8(*best, bestfd, PCI_SECONDARY_BUS);
             virPCIDeviceConfigClose(*best, bestfd);
@@ -799,7 +802,7 @@ virPCIDeviceTrySecondaryBusReset(virPCIDevicePtr dev,
                        dev->name);
         return -1;
     }
-    if ((parentfd = virPCIDeviceConfigOpen(parent, true)) < 0)
+    if ((parentfd = virPCIDeviceConfigOpen(parent, true, false)) < 0)
         goto out;
 
     VIR_DEBUG("%s %s: doing a secondary bus reset", dev->id, dev->name);
@@ -948,7 +951,7 @@ virPCIDeviceReset(virPCIDevicePtr dev,
     }
     VIR_DEBUG("Resetting device %s", dev->name);
 
-    if ((fd = virPCIDeviceConfigOpen(dev, true)) < 0)
+    if ((fd = virPCIDeviceConfigOpen(dev, true, false)) < 0)
         goto cleanup;
 
     if (virPCIDeviceInit(dev, fd) < 0)
@@ -2393,7 +2396,7 @@ virPCIDeviceDownstreamLacksACS(virPCIDevicePtr dev)
     int ret = 0;
     uint16_t device_class;
 
-    if ((fd = virPCIDeviceConfigOpen(dev, true)) < 0)
+    if ((fd = virPCIDeviceConfigOpen(dev, true, false)) < 0)
         return -1;
 
     if (virPCIDeviceInit(dev, fd) < 0) {
@@ -3139,7 +3142,7 @@ virPCIDeviceIsPCIExpress(virPCIDevicePtr dev)
     int fd;
     int ret = -1;
 
-    if ((fd = virPCIDeviceConfigOpen(dev, true)) < 0)
+    if ((fd = virPCIDeviceConfigOpen(dev, true, false)) < 0)
         return ret;
 
     if (virPCIDeviceInit(dev, fd) < 0)
@@ -3159,7 +3162,7 @@ virPCIDeviceHasPCIExpressLink(virPCIDevicePtr dev)
     int ret = -1;
     uint16_t cap, type;
 
-    if ((fd = virPCIDeviceConfigOpen(dev, true)) < 0)
+    if ((fd = virPCIDeviceConfigOpen(dev, true, false)) < 0)
         return ret;
 
     if (virPCIDeviceInit(dev, fd) < 0)
@@ -3187,7 +3190,7 @@ virPCIDeviceGetLinkCapSta(virPCIDevicePtr dev,
     int fd;
     int ret = -1;
 
-    if ((fd = virPCIDeviceConfigOpen(dev, true)) < 0)
+    if ((fd = virPCIDeviceConfigOpen(dev, true, false)) < 0)
         return ret;
 
     if (virPCIDeviceInit(dev, fd) < 0)
@@ -3225,7 +3228,7 @@ int virPCIGetHeaderType(virPCIDevicePtr dev, int *hdrType)
 
     *hdrType = -1;
 
-    if ((fd = virPCIDeviceConfigOpen(dev, true)) < 0)
+    if ((fd = virPCIDeviceConfigOpen(dev, true, true)) < 0)
         return -1;
 
     type = virPCIDeviceRead8(dev, fd, PCI_HEADER_TYPE);
